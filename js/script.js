@@ -1,7 +1,7 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
     $.ajax({
-        url: "../php/countryBorders.php",
+        url: "php/dropdown.php",
         type: 'POST',
         dataType: 'json',
     
@@ -18,9 +18,9 @@ $(document).ready(function() {
                     $('#countrySelect').append($('<option>',{
                         value: result.data[index].code,
                         text: result.data[index].name
-                    })); 
-
-                 }); 
+                    }));                    
+                 });    
+                 
 
             }
         
@@ -29,4 +29,6 @@ $(document).ready(function() {
             // your error code
         }
     }); 
+
+
 });
