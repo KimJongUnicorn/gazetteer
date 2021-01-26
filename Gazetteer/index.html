@@ -33,18 +33,7 @@
             </form>
         </div>
 
-        <div id="mapid">
-            <script>
-                var mymap = L.map('mapid').setView([53.100, -1.785], 5.75); 
-
-                const attribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
-                const tileUrl = "https://api.mapbox.com/styles/v1/kimjongunicorn/ckjyf3voz0pmt17nu6fys3ht7/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoia2ltam9uZ3VuaWNvcm4iLCJhIjoiY2tqeWV6MXV2MGI3YzJvbzJkenl0ZXl2bSJ9.r56ig_YevLwVREuhe6HhlA";
-                var tiles = L.tileLayer(tileUrl, { attribution });
-                tiles.addTo(mymap);
-
-            </script>
-        </div>
-
+        <div id="mapid"></div>
 
         <script type="application/javascript" src="js/jquery-2.2.3.min.js"></script>
 
