@@ -7,11 +7,11 @@
     $countryBorders = json_decode(file_get_contents("../js/countryBorders.geo.json"), true);
 
     $border = null;
-    $countrySelect= $_REQUEST['countrySelect'];
+    
 
     foreach ($countryBorders['features'] as $feature) {
         
-        if ($feature["properties"]["iso_a2"] == $countrySelect) {
+        if ($feature["properties"]["iso_a2"] == $_REQUEST["countrySelect"]) {
 
             $border = $feature;
             break;
