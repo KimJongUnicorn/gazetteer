@@ -1,4 +1,6 @@
-#mapid { height: 1000px; }
+#mapid { 
+    height: 950px; 
+}
 
 #header {
     text-align: center;
@@ -8,6 +10,22 @@
     color:rgb(82, 82, 82);
 }
 
-#selection {
+#countrySelect {
     background-color: rgb(201, 201, 201);
+}
+
+#info_text {
+    @media screen and (max-width: 500px) {
+        width: 100px;
+    }
+    padding: 6px 8px;
+    font: 'Alegreya SC', serif;
+    font-size: 1em;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+#info_text h4 {
+    margin: 0 0 5px;
+    color: #777;
 }
