@@ -1,3 +1,4 @@
+//CREATING THE MAP
 var mymap = L.map('mapid').setView([53.100, -1.785], 5.75); 
 
 const attribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
@@ -5,12 +6,13 @@ const tileUrl = "https://api.mapbox.com/styles/v1/kimjongunicorn/ckjyf3voz0pmt17
 var tiles = L.tileLayer(tileUrl, { attribution });
 tiles.addTo(mymap);
 
+//ADDING THE INFO TEXT BOX
 L.Control.textbox = L.Control.extend({
     onAdd: function(mymap) {
         
     var text = L.DomUtil.create('div');
     text.id = "info_text";
-    text.innerHTML = "<h4>Country Information<h4><br><p id='capitalCity'>Capital City: </p>";
+    text.innerHTML = "<h4>Country Information<h4><hr><p id='capitalCity'>Capital City: </p><p id='continent'>Continent: </p><p id='demonym'>Demonym: </p><p id='language'>Majority Language: </p><p id='population'>Population: </p><p id='currency'>Currency: </p><div id='flag'></div>";
     return text;
     },
 
@@ -21,6 +23,13 @@ L.Control.textbox = L.Control.extend({
 L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
 L.control.textbox({ position: 'topright' }).addTo(mymap);
 
+//FUNCTION - FORMAT POPULATION TO BE MORE READABLE - TO BE USED LATER
+function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  }
+
+
+//AJAX CALLS
 $(document).ready(function () {
 
     $.ajax({
@@ -72,9 +81,15 @@ $('#countrySelect').change(function() {
 
             if (result.status.name == "ok") {
                 
+                if (mymap.hasLayer(geoJsonLayer)) {
+                    featureGroup.removeLayers(geoJsonLayer);
+                }
+
+                var geoJsonLayer = null;
+                var featureGroup = L.featureGroup();
+
                 var mygeoJson = result.data.border;
-                var newView1 = result.data.border.geometry.coordinates[0][0][0];
-                var newView2 = result.data.border.geometry.coordinates[0][0][1];
+                
 
                 var myStyle = {
                     "color": "#000000",
@@ -82,17 +97,13 @@ $('#countrySelect').change(function() {
                     "opacity": 0.4
                 };
 
-                L.geoJson(mygeoJson, {
+                geoJsonLayer = L.geoJson(mygeoJson, {
                     style: myStyle
-                }).addTo(mymap);
+                });
 
-                console.log(newView1, newView2);
- 
-                if (Array.isArray(newView1)) {
-                    mymap.setView([newView2[1], newView2[0]], 5.75);
-                } else {
-                    mymap.setView([newView2, newView1], 5.75);
-                }               
+                featureGroup.addLayer(geoJsonLayer);
+                featureGroup.addTo(mymap);
+           
                 
             }
         
@@ -122,9 +133,62 @@ $('#countrySelect').change(function() {
             if (result.status.name == "ok") {
                 
                 var newCapital = result.data.border.capital;
+                var newContinent = result.data.border.continentName;
+                var newPopulation = result.data.border.population;
+
                 console.log(newCapital);
 
-                $('#capitalCity').append(newCapital);
+                $('#capitalCity').html("Capital City: " + newCapital);
+                $('#continent').html("Continent: " + newContinent);
+                $('#population').html("Population: " + formatNumber(newPopulation));
+                
+
+               
+            }
+        
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // your error code
+        }
+    }); 
+
+
+});
+
+$('#countrySelect').change(function() {
+
+    $.ajax({
+        url: "php/restCountries.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            countrySelect: $('#countrySelect').val()
+        },
+
+        success: function(result) {
+
+            console.log(result);
+
+            if (result.status.name == "ok") {
+
+                var newLat = result.data.border.latlng[0];
+                var newLng = result.data.border.latlng[1];
+                
+                var newDemonym = result.data.border.demonym;
+                var newCurrency = result.data.border.currencies[0].name;
+                var newCurrencySymbol = result.data.border.currencies[0].symbol;
+                var newFlag = result.data.border.flag;
+                var newLanguage = result.data.border.languages[0].name;
+
+                
+                $('#demonym').html("Demonym: " + newDemonym);
+                $('#currency').html("Currency: " + newCurrency + "(" + newCurrencySymbol + ")");
+                $('#flag').html('<img src ="' + newFlag + '" ' + 'width="350">');
+                $('#language').html("Majority Language: " + newLanguage);
+
+                mymap.setView([newLat, newLng], 5.75);
+
+
 
                
             }
