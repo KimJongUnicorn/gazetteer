@@ -13,41 +13,6 @@ var mymap = L.map('mapid',{ zoomControl: false }).setView([53.100, -1.785], 5.75
 var tiles = L.tileLayer(mapView, { attribution });
 tiles.addTo(mymap);
 
-//ADDING THE INFO TEXT BOX
-L.Control.textbox = L.Control.extend({
-    onAdd: function(mymap) {
-        
-    var text = L.DomUtil.create('div');
-    text.id = "info_text";
-    text.innerHTML = "<h4>Country Information<h4><hr><p id='capitalCity'>Capital City: </p><p id='continent'>Continent: </p><p id='demonym'>Demonym: </p><p id='language'>Majority Language: </p><p id='population'>Population: </p><p id='currency'>Currency: </p><div id='flag'></div>";
-    return text;
-    },
-
-    onRemove: function(mymap) {
-        // Nothing to do here
-    }
-});
-L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
-L.control.textbox({ position: 'topright' }).addTo(mymap);
-
-
-//ADDING THE WEATHER BOX
-L.Control.textbox = L.Control.extend({
-    onAdd: function(mymap) {
-        
-    var text = L.DomUtil.create('div');
-    text.id = "weather_text";
-    text.innerHTML = "<h4 id='weather'>Weather</h4><hr><table><tr><td id='icon'></td><td id='temp'></td><td>|</td><td id='tempF'></td></tr></table><p id='weatherDesc'></p><p id='humidity'></p><p id='wind'></p>";
-    return text;
-    },
-
-    onRemove: function(mymap) {
-        // Nothing to do here
-    }
-});
-L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
-L.control.textbox({ position: 'topright' }).addTo(mymap);
-
 
 //FUNCTION - FORMAT POPULATION TO BE MORE READABLE - TO BE USED LATER
 function formatNumber(num) {
@@ -114,10 +79,46 @@ $('#countrySelect').change(function() {
             console.log(result);
 
             if (result.status.name == "ok") {
-                
-                if (mymap.hasLayer(geoJsonLayer)) {
-                    featureGroup.removeLayers(geoJsonLayer);
-                }
+
+                mymap.remove();
+                mymap = L.map('mapid',{ zoomControl: false }).setView([53.100, -1.785], 5.75); 
+                tiles.addTo(mymap);
+
+                                //ADDING THE INFO TEXT BOX
+                L.Control.textbox = L.Control.extend({
+                    onAdd: function(mymap) {
+                        
+                    var text = L.DomUtil.create('div');
+                    text.id = "info_text";
+                    text.innerHTML = "<h4>Country Information<h4><hr><p id='capitalCity'>Capital City: </p><p id='continent'>Continent: </p><p id='demonym'>Demonym: </p><p id='language'>Majority Language: </p><p id='population'>Population: </p><p id='currency'>Currency: </p><div id='flag'></div>";
+                    return text;
+                    },
+
+                    onRemove: function(mymap) {
+                        // Nothing to do here
+                    }
+                });
+                L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+                L.control.textbox({ position: 'topright' }).addTo(mymap);
+
+
+                //ADDING THE WEATHER BOX
+                L.Control.textbox = L.Control.extend({
+                    onAdd: function(mymap) {
+                        
+                    var text = L.DomUtil.create('div');
+                    text.id = "weather_text";
+                    text.innerHTML = "<h4 id='weather'>Weather</h4><hr><table><tr><td id='icon'></td><td id='temp'></td><td>|</td><td id='tempF'></td></tr></table><p id='weatherDesc'></p><p id='humidity'></p><p id='wind'></p>";
+                    return text;
+                    },
+
+                    onRemove: function(mymap) {
+                        // Nothing to do here
+                    }
+                });
+                L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+                L.control.textbox({ position: 'topright' }).addTo(mymap);
+
 
                 var geoJsonLayer = null;
                 var featureGroup = L.featureGroup();
@@ -218,11 +219,6 @@ var newCountryCode = "";
 var capitalLat = "";
 var capitalLng = "";
 var capitalImage = "";
-
-var cityLat = "";
-var cityLng = "";
-var cityName = "";
-var cityPop = "";
 
 $('#countrySelect').change(function() {
 
@@ -386,11 +382,20 @@ $('#countrySelect').change(function() {
                             var cities = result.data;
 
                             cities.forEach(function(city) {
-                                cityLat = city.lat;
-                                cityLng = city.lng;
-                                cityName = city.name;
-                                cityPop = city.population;
+                                var cityLat = city.lat;
+                                var cityLng = city.lng;
+                                var cityName = city.name;
+                                var cityPop = city.population;
+
+                                var cityMarker = L.AwesomeMarkers.icon({
+                                    icon: 'city',
+                                    markerColor: 'red',
+                                    prefix: 'fa',
+                                    iconColor: 'white'
+                                });
+
                                 var cityImage = "";
+
                                 
 
                                 $.ajax({
@@ -404,18 +409,12 @@ $('#countrySelect').change(function() {
                             
                                     success: function(result) {
                             
-                                        if (result.status.name == "ok") {
-                
-                                            cityImage = result.data.imageinfo[0].responsiveUrls[2];
+                                        if (result.status.name == "ok") {                                           
 
-                                            var cityMarker = L.AwesomeMarkers.icon({
-                                                icon: 'city',
-                                                markerColor: 'red',
-                                                prefix: 'fa',
-                                                iconColor: 'white'
-                                            });
-                                            L.marker([cityLat, cityLng], {icon: cityMarker}).addTo(mymap)
-                                            .bindPopup(`${cityName}, population: ${formatNumber(cityPop)}.<br><img src='${cityImage}' width='300px'/>`);
+                                                cityImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                L.marker([cityLat, cityLng], {icon: cityMarker}).addTo(mymap)
+                                                .bindPopup(`${cityName}, population: ${formatNumber(cityPop)}.<br><img src='${cityImage}' width='300px'/>`);                                            
+                                    
                                         }
                                     
                                     },
@@ -460,8 +459,34 @@ $('#countrySelect').change(function() {
                                     prefix: 'fa',
                                     iconColor: 'white'
                                 });
-                                L.marker([lakeLat, lakeLng], {icon: lakeMarker}).addTo(mymap)
-                                .bindPopup(`${lakeName}`);
+
+                                var lakeImage = "";
+
+                                $.ajax({
+                                    url: "php/wikiPhoto.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: lakeLat,
+                                        lng: lakeLng
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+
+                                                lakeImage = result.data.imageinfo[0].responsiveUrls[2];
+
+                                                L.marker([lakeLat, lakeLng], {icon: lakeMarker}).addTo(mymap)
+                                                .bindPopup(`${lakeName}.<br><img src='${lakeImage}' width='300px'/>`);                                            
+                                    
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
                             
                             });
                         }
@@ -493,16 +518,42 @@ $('#countrySelect').change(function() {
                                 var parkLng = park.lng;
                                 var parkName = park.name;
 
-                                if (parkName.includes("National")) {
+                                
                                     var parkMarker = L.AwesomeMarkers.icon({
                                         icon: 'tree',
                                         markerColor: 'green',
                                         prefix: 'fa',
                                         iconColor: 'white'
                                     });
-                                    L.marker([parkLat, parkLng], {icon: parkMarker}).addTo(mymap)
-                                    .bindPopup(`${parkName}`);
-                                }
+                                
+
+                                var parkImage = "";
+
+                                    $.ajax({
+                                        url: "php/wikiPhoto.php",
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        data: {
+                                            lat: parkLat,
+                                            lng: parkLng
+                                        },
+                                
+                                        success: function(result) {
+                                
+                                            if (result.status.name == "ok") {                                           
+    
+                                                    parkImage = result.data.imageinfo[0].responsiveUrls[2];
+    
+                                                    L.marker([parkLat, parkLng], {icon: parkMarker}).addTo(mymap)
+                                                    .bindPopup(`${parkName}.<br><img src='${parkImage}' width='300px'/>`);                                            
+                                        
+                                            }
+                                        
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            // your error code
+                                        }
+                                    });
                             });
                         }
                     
@@ -512,7 +563,7 @@ $('#countrySelect').change(function() {
                     }
                 });
                 
-
+                //ADDING IN MOUNTAINS
                 $.ajax({
                     url: "php/mountains.php",
                     type: 'POST',
@@ -541,8 +592,34 @@ $('#countrySelect').change(function() {
                                     prefix: 'fa',
                                     iconColor: 'white'
                                 });
-                                L.marker([mountainLat, mountainLng], {icon: mountainMarker}).addTo(mymap)
-                                .bindPopup(`${mountainName}`);
+
+                                var mountainImage = "";
+
+                                $.ajax({
+                                    url: "php/wikiPhoto.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: mountainLat,
+                                        lng: mountainLng
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+
+                                            mountainImage = result.data.imageinfo[0].responsiveUrls[2];
+
+                                                L.marker([mountainLat, mountainLng], {icon: mountainMarker}).addTo(mymap)
+                                                .bindPopup(`${mountainName}.<br><img src='${mountainImage}' width='300px'/>`);                                            
+                                    
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
                                 
                             });
                         }
