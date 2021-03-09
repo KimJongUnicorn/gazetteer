@@ -27,6 +27,14 @@ $('#weatherInfoButton').click(function() {
     $('#weather_text').toggle();
 });
 
+$('#newsButton').click(function() {
+    $('#news_text').toggle();
+});
+
+$('#musicButton').click(function() {
+    $('#anthem_text').toggle();
+});
+
 
 //AJAX CALLS
 //POPULATING THE DROP DOWN
@@ -101,6 +109,23 @@ $('#countrySelect').change(function() {
                 L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
                 L.control.textbox({ position: 'topright' }).addTo(mymap);
 
+                //ADDING THE NEWS BOX
+                L.Control.textbox = L.Control.extend({
+                    onAdd: function(mymap) {
+                        
+                    var text = L.DomUtil.create('div');
+                    text.id = "news_text";
+                    text.innerHTML = "<h4>Current Headlines<h4><br><h5 id='article1'></h5><h6 id='author1'></h6><h5 id='article2'></h5><h6 id='author2'></h6><h5 id='article3'></h5><h6 id='author3'></h6><h5 id='article4'></h5><h6 id='author4'></h6><h5 id='article5'></h5><h6 id='author5'></h6>";
+                    return text;
+                    },
+
+                    onRemove: function(mymap) {
+                        // Nothing to do here
+                    }
+                });
+                L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+                L.control.textbox({ position: 'topright' }).addTo(mymap);
+
 
                 //ADDING THE WEATHER BOX
                 L.Control.textbox = L.Control.extend({
@@ -118,6 +143,23 @@ $('#countrySelect').change(function() {
                 });
                 L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
                 L.control.textbox({ position: 'topright' }).addTo(mymap);
+
+                //ADDING THE MUSIC BOX
+                L.Control.textbox = L.Control.extend({
+                    onAdd: function(mymap) {
+                        
+                    var text = L.DomUtil.create('div');
+                    text.id = "anthem_text";
+                    text.innerHTML = "<div id='anthem'></div>";
+                    return text;
+                    },
+
+                    onRemove: function(mymap) {
+                        // Nothing to do here
+                    }
+                });
+                L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+                L.control.textbox({ position: 'bottomleft' }).addTo(mymap);
 
 
                 var geoJsonLayer = null;
@@ -209,8 +251,6 @@ $(document).ready(function () {
 
 });
 
-//ADDING COUNTRY INFO - GEONAMES
-
 var newCapital = "";
 var photoCountry = "";
 var newPhotoCountry = "";
@@ -219,6 +259,14 @@ var newCountryCode = "";
 var capitalLat = "";
 var capitalLng = "";
 var capitalImage = "";
+
+$.fn.preload = function() {
+    this.each(function(){
+        $('<img/>')[0].src = this;
+    });
+}
+
+//ADDING COUNTRY INFO - GEONAMES
 
 $('#countrySelect').change(function() {
 
@@ -237,7 +285,10 @@ $('#countrySelect').change(function() {
             if (result.status.name == "ok") {
                 
                 newCapital = result.data.border.capital;
-                photoCountry = result.data.border.countryName;           
+                photoCountry = result.data.border.countryName;
+                if (photoCountry == 'United Kingdom') {
+                    photoCountry = 'Britain';
+                }           
                 newPhotoCountry = photoCountry.replace(/ /g, "%20");
                 newCountryCode = result.data.border.countryCode;
                 var newContinent = result.data.border.continentName;
@@ -280,6 +331,67 @@ $('#countrySelect').change(function() {
                             $('#weatherDesc').html(wDescription.charAt(0).toUpperCase() + wDescription.slice(1));
                             $('#humidity').html('Humidity: ' + humidity + '%');
                             $('#wind').html('Wind: ' + Math.round(wind) + ' KMPH');
+                         
+                        }
+                    
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // your error code
+                    }
+                });
+
+                //NEWS API
+                $.ajax({
+                    url: "php/news.php",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        country: photoCountry
+                    },
+            
+                    success: function(result) {
+            
+                        console.log(result);
+            
+                        if (result.status.name == "ok") {
+                            var article1Title = result.data.articles[0].title;
+                            var article2Title = result.data.articles[1].title;
+                            var article3Title = result.data.articles[2].title;
+                            var article4Title = result.data.articles[3].title;
+                            var article5Title = result.data.articles[4].title;
+
+                            var article1Link = result.data.articles[0].url;
+                            var article2Link = result.data.articles[1].url;
+                            var article3Link = result.data.articles[2].url;
+                            var article4Link = result.data.articles[3].url;
+                            var article5Link = result.data.articles[4].url;
+
+                            var article1Author = result.data.articles[0].author;
+                            var article2Author = result.data.articles[1].author;
+                            var article3Author = result.data.articles[2].author;
+                            var article4Author = result.data.articles[3].author;
+                            var article5Author = result.data.articles[4].author;
+
+                            var article1Source = result.data.articles[0].source.name;
+                            var article2Source = result.data.articles[1].source.name;
+                            var article3Source = result.data.articles[2].source.name;
+                            var article4Source = result.data.articles[3].source.name;
+                            var article5Source = result.data.articles[4].source.name;
+                        
+                            $('#article1').html(`<a href=${article1Link} target="_blank">${article1Title}</a>`);
+                            $('#author1').html(article1Author + ', ' + article1Source);
+
+                            $('#article2').html(`<a href=${article2Link} target="_blank">${article2Title}</a>`);
+                            $('#author2').html(article2Author + ', ' + article2Source);
+
+                            $('#article3').html(`<a href=${article3Link} target="_blank">${article3Title}</a>`);
+                            $('#author3').html(article3Author + ', ' + article3Source);
+
+                            $('#article4').html(`<a href=${article4Link} target="_blank">${article4Title}</a>`);
+                            $('#author4').html(article4Author + ', ' + article4Source);
+
+                            $('#article5').html(`<a href=${article5Link} target="_blank">${article5Title}</a>`);
+                            $('#author5').html(article5Author + ', ' + article5Source);
                          
                         }
                     
@@ -332,7 +444,7 @@ $('#countrySelect').change(function() {
                                         if (result.status.name == "ok") {
                 
                                             capitalImage = result.data.imageinfo[0].responsiveUrls[2];
-                                            console.log(capitalImage);
+                                            $([capitalImage]).preload();
 
                                             var capitalMarker = L.AwesomeMarkers.icon({
                                                 icon: 'star',
@@ -380,11 +492,13 @@ $('#countrySelect').change(function() {
                         if (result.status.name == "ok") {
                             
                             var cities = result.data;
+                            
 
                             cities.forEach(function(city) {
                                 var cityLat = city.lat;
                                 var cityLng = city.lng;
                                 var cityName = city.name;
+                                var newCityName = cityName.replace(/ /g, "%20");
                                 var cityPop = city.population;
 
                                 var cityMarker = L.AwesomeMarkers.icon({
@@ -395,8 +509,33 @@ $('#countrySelect').change(function() {
                                 });
 
                                 var cityImage = "";
+                                var cityWiki = "";
 
-                                
+                                $.ajax({
+                                    url: "php/wiki.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        capital: newCityName,
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+                                        
+                                            if (result.data[0] == undefined) {
+                                                cityWiki = "https://en.wikipedia.org/wiki/City";
+                                            } else {
+                                                cityWiki = result.data[0].wikipediaUrl;
+                                            }                                             
+                                    
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
 
                                 $.ajax({
                                     url: "php/wikiPhoto.php",
@@ -411,10 +550,17 @@ $('#countrySelect').change(function() {
                             
                                         if (result.status.name == "ok") {                                           
 
-                                                cityImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                if (result.data == undefined) {
+                                                    cityImage = "./icons/city_icon.png";
+                                                } else {
+                                                    cityImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                }
+                                          
+                                                $([cityImage]).preload();
+                                
                                                 L.marker([cityLat, cityLng], {icon: cityMarker}).addTo(mymap)
-                                                .bindPopup(`${cityName}, population: ${formatNumber(cityPop)}.<br><img src='${cityImage}' width='300px'/>`);                                            
-                                    
+                                                .bindPopup(`<a href='http://${cityWiki}' target='_blank'>${cityName}</a>, population: ${formatNumber(cityPop)}.<br><img src='${cityImage}' width='300px'/>`);
+                                               
                                         }
                                     
                                     },
@@ -424,6 +570,8 @@ $('#countrySelect').change(function() {
                                 });
                             
                             });
+
+
                         }
                     
                     },
@@ -452,6 +600,7 @@ $('#countrySelect').change(function() {
                                 var lakeLat = lake.lat;
                                 var lakeLng = lake.lng;
                                 var lakeName = lake.name;
+                                var newLakeName = lakeName.replace(/ /g, "%20");
 
                                 var lakeMarker = L.AwesomeMarkers.icon({
                                     icon: 'water',
@@ -461,6 +610,32 @@ $('#countrySelect').change(function() {
                                 });
 
                                 var lakeImage = "";
+                                var lakeWiki = "";
+
+                                $.ajax({
+                                    url: "php/wiki.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        capital: newLakeName,
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+                                        
+                                            if (result.data[0] == undefined) {
+                                                lakeWiki = "https://en.wikipedia.org/wiki/Lake";
+                                            } else {
+                                                lakeWiki = result.data[0].wikipediaUrl;
+                                            }                                   
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
 
                                 $.ajax({
                                     url: "php/wikiPhoto.php",
@@ -475,10 +650,16 @@ $('#countrySelect').change(function() {
                             
                                         if (result.status.name == "ok") {                                           
 
-                                                lakeImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                if (result.data == undefined) {
+                                                    lakeImage = "./icons/orion_sailing.png";
+                                                } else {
+                                                    lakeImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                }
+                                          
+                                                $([lakeImage]).preload();
 
                                                 L.marker([lakeLat, lakeLng], {icon: lakeMarker}).addTo(mymap)
-                                                .bindPopup(`${lakeName}.<br><img src='${lakeImage}' width='300px'/>`);                                            
+                                                .bindPopup(`<a href='http://${lakeWiki}' target='_blank'>${lakeName}</a>.<br><img src='${lakeImage}' width='300px'/>`);
                                     
                                         }
                                     
@@ -517,7 +698,7 @@ $('#countrySelect').change(function() {
                                 var parkLat = park.lat;
                                 var parkLng = park.lng;
                                 var parkName = park.name;
-
+                                var newParkName = parkName.replace(/ /g, "%20");
                                 
                                     var parkMarker = L.AwesomeMarkers.icon({
                                         icon: 'tree',
@@ -528,7 +709,32 @@ $('#countrySelect').change(function() {
                                 
 
                                 var parkImage = "";
+                                var parkWiki = "";
 
+                                $.ajax({
+                                    url: "php/wiki.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        capital: newParkName,
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+                                        
+                                            if (result.data[0] == undefined) {
+                                                parkWiki = "https://en.wikipedia.org/wiki/Park";
+                                            } else {
+                                                parkWiki = result.data[0].wikipediaUrl;
+                                            }                                   
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
                                     $.ajax({
                                         url: "php/wikiPhoto.php",
                                         type: 'POST',
@@ -542,10 +748,16 @@ $('#countrySelect').change(function() {
                                 
                                             if (result.status.name == "ok") {                                           
     
-                                                    parkImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                    if (result.data == undefined) {
+                                                        parkImage = "./icons/park_icon.png";
+                                                    } else {
+                                                        parkImage = result.data.imageinfo[0].responsiveUrls[2];
+                                                    }
+                                              
+                                                    $([parkImage]).preload();
     
                                                     L.marker([parkLat, parkLng], {icon: parkMarker}).addTo(mymap)
-                                                    .bindPopup(`${parkName}.<br><img src='${parkImage}' width='300px'/>`);                                            
+                                                    .bindPopup(`<a href='http://${parkWiki}' target='_blank'>${parkName}</a>.<br><img src='${parkImage}' width='300px'/>`);                                            
                                         
                                             }
                                         
@@ -584,6 +796,7 @@ $('#countrySelect').change(function() {
                                 var mountainLat = mountain.lat;
                                 var mountainLng = mountain.lng;
                                 var mountainName = mountain.name;
+                                var newMountainName = mountainName.replace(/ /g, "%20");
 
                         
                                 var mountainMarker = L.AwesomeMarkers.icon({
@@ -594,6 +807,32 @@ $('#countrySelect').change(function() {
                                 });
 
                                 var mountainImage = "";
+                                var mountainWiki = "";
+
+                                $.ajax({
+                                    url: "php/wiki.php",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        capital: newMountainName,
+                                    },
+                            
+                                    success: function(result) {
+                            
+                                        if (result.status.name == "ok") {                                           
+                                        
+                                            if (result.data[0] == undefined) {
+                                                mountainWiki = "https://en.wikipedia.org/wiki/Mountain";
+                                            } else {
+                                                mountainWiki = result.data[0].wikipediaUrl;
+                                            }                                  
+                                        }
+                                    
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        // your error code
+                                    }
+                                });
 
                                 $.ajax({
                                     url: "php/wikiPhoto.php",
@@ -608,10 +847,16 @@ $('#countrySelect').change(function() {
                             
                                         if (result.status.name == "ok") {                                           
 
-                                            mountainImage = result.data.imageinfo[0].responsiveUrls[2];
+                                            if (result.data == undefined) {
+                                                mountainImage = "./icons/mountain_icon.png";
+                                            } else {
+                                                mountainImage = result.data.imageinfo[0].responsiveUrls[2];
+                                            }
+                                          
+                                            $([mountainImage]).preload();
 
                                                 L.marker([mountainLat, mountainLng], {icon: mountainMarker}).addTo(mymap)
-                                                .bindPopup(`${mountainName}.<br><img src='${mountainImage}' width='300px'/>`);                                            
+                                                .bindPopup(`<a href='http://${mountainWiki}' target='_blank'>${mountainName}</a>.<br><img src='${mountainImage}' width='300px'/>`);                                            
                                     
                                         }
                                     
@@ -637,8 +882,9 @@ $('#countrySelect').change(function() {
         error: function(jqXHR, textStatus, errorThrown) {
             // your error code
         }
-    }); 
+    });
 
+var newDemonym = "";
 
 });
 //ADDING COUNTRY INFO - RESTCOUNTRIES
@@ -658,7 +904,7 @@ $('#countrySelect').change(function() {
 
             if (result.status.name == "ok") {
                 
-                var newDemonym = result.data.border.demonym;
+                newDemonym = result.data.border.demonym;
                 var newCurrency = result.data.border.currencies[0].name;
                 var newCurrencySymbol = result.data.border.currencies[0].symbol;
                 var newFlag = result.data.border.flag;
@@ -672,6 +918,29 @@ $('#countrySelect').change(function() {
                 $('#flag').html('<img src ="' + newFlag + '" ' + 'width="250px">');
                 $('#language').html("Majority Language: " + newLanguage);
                
+
+                $.ajax({
+                    url: "php/anthem.php",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        country: newDemonym,
+                    },
+            
+                    success: function(result) {
+            
+                        if (result.status.name == "ok") {    
+                            
+                            var anthem = result.data.data[0].id;
+                            $('#anthem').html(`<iframe scrolling="no" frameborder="0" allowTransparency="true" src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=500&height=90&color=EF5466&layout=&size=medium&type=tracks&id=${anthem}&app_id=1" width="500" height="90"></iframe>`);  
+                              
+                        }
+                    
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // your error code
+                    }
+                });
 
             }
         

@@ -48,6 +48,52 @@ html, body {
     width: 55px;
 }
 
+#newsButton {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+    border: 2px solid;
+    border-radius: 50%;
+    border-color: black;
+    position: absolute;
+    background-color: rgb(242, 238, 233);
+    z-index: 1000;
+    top: 280px;
+    left: 30px;
+    right: 0;
+    
+}
+
+#newsIcon {
+    position:absolute;
+    top: 20%;
+    right: 20%;
+    width: 45px;
+}
+
+#musicButton {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+    border: 2px solid;
+    border-radius: 50%;
+    border-color: black;
+    position: absolute;
+    background-color: rgb(242, 238, 233);
+    z-index: 1000;
+    top: 380px;
+    left: 30px;
+    right: 0;
+    
+}
+
+#musicIcon {
+    position:absolute;
+    top: 20%;
+    right: 20%;
+    width: 45px;
+}
+
 
 #dropdown {
     position: absolute;
@@ -83,6 +129,7 @@ html, body {
     border-color:rgb(228, 166, 119);
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     display: none;
+    float: right;
 }
 
 #weather_text {
@@ -96,6 +143,39 @@ html, body {
     border-color:rgb(180, 228, 155);
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     display: none;
+    float: right;
+}
+
+#news_text {
+    margin: 20px 20px auto;
+    padding: 5px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.5em;
+    background-color:rgb(236, 236, 236);
+    border: solid 3px;
+    border-radius: 10px;
+    border-color:rgb(114, 114, 114);
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    width: 265px;
+    float: right;
+    display: none;
+    clear: none;
+}
+
+#anthem_text {
+    margin: 10px;
+    padding: 5px;
+    background-color:rgb(255, 190, 190);
+    border: solid 3px;
+    border-radius: 10px;
+    border-color:rgb(236, 98, 98);
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    width: 518px;
+    height: 110px;
+    bottom: 10px;
+    float: right;
+    display: none;
+    clear: none;
 }
 
 #temp, #tempF {
@@ -176,6 +256,64 @@ html, body {
         width: 200px;
     }
 
-    
+    #newsButton {
+        width: 50px;
+        height: 50px;
+        top: 170px;
+        left: 10px;       
+    }
+
+    #newsIcon {
+        position:absolute;
+        top: 20%;
+        right: 22%;
+        width: 27px;
+    }
+
+    #news_text {
+        margin: 5px 5px auto;
+        padding: 5px;
+
+        top: 50px;
+        width: 200px;
+    }
+
+    #news_text h4, #news_text h5, #news_text h6 {
+        font-size: 0.6em;
+        line-height: 10px;
+    }
+
+    #news_text br {
+        display: none;
+    }
+
+    #article4, #author4, #article5, #author5 {
+        display: none;
+    }
+
+    #musicButton {
+        width: 50px;
+        height: 50px;
+        top: 230px;
+        left: 10px;       
+    }
+
+    #musicIcon {
+        position:absolute;
+        top: 12%;
+        right: 15%;
+        width: 33px;
+    }
+
+    #anthem_text {
+        width: 100px;
+        height: 100px;
+    }
+
+    #anthem_text iframe {
+        width: 82px;
+        height: 80px;
+        right: -50px;
+    }
 
 }
