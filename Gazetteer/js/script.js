@@ -35,7 +35,6 @@ $('#musicButton').click(function() {
     $('#anthem_text').toggle();
 });
 
-
 //AJAX CALLS
 //POPULATING THE DROP DOWN
 $(document).ready(function () {
@@ -46,8 +45,6 @@ $(document).ready(function () {
         dataType: 'json',
     
         success: function(result) {
-
-            console.log(result);
 
             if (result.status.name == "ok") {
 
@@ -84,13 +81,12 @@ $('#countrySelect').change(function() {
 
         success: function(result) {
 
-            console.log(result);
-
             if (result.status.name == "ok") {
 
                 mymap.remove();
                 mymap = L.map('mapid',{ zoomControl: false }).setView([53.100, -1.785], 5.75); 
                 tiles.addTo(mymap);
+                
 
                                 //ADDING THE INFO TEXT BOX
                 L.Control.textbox = L.Control.extend({
@@ -207,8 +203,6 @@ $(document).ready(function () {
 
         success: function(result) {
 
-            console.log(result);
-
             if (result.status.name == "ok") {
                
                 fetch('https://extreme-ip-lookup.com/json/')
@@ -260,6 +254,8 @@ var capitalLat = "";
 var capitalLng = "";
 var capitalImage = "";
 
+var markers = L.markerClusterGroup();
+
 $.fn.preload = function() {
     this.each(function(){
         $('<img/>')[0].src = this;
@@ -279,8 +275,6 @@ $('#countrySelect').change(function() {
         },
 
         success: function(result) {
-
-            console.log(result);
 
             if (result.status.name == "ok") {
                 
@@ -311,11 +305,7 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
-
-                            console.log(result.data.weather[0].icon);
 
                             var weatherInC = Math.round(result.data.main.temp - 272.15);
                             var weatherInF = Math.round(result.data.main.temp * 1.8 - 459.67);
@@ -350,8 +340,6 @@ $('#countrySelect').change(function() {
                     },
             
                     success: function(result) {
-            
-                        console.log(result);
             
                         if (result.status.name == "ok") {
                             var article1Title = result.data.articles[0].title;
@@ -412,8 +400,6 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
 
                             var wikiLink = null;
@@ -439,22 +425,22 @@ $('#countrySelect').change(function() {
                             
                                     success: function(result) {
                             
-                                        console.log(result);
-                            
                                         if (result.status.name == "ok") {
                 
                                             capitalImage = result.data.imageinfo[0].responsiveUrls[2];
                                             $([capitalImage]).preload();
 
-                                            var capitalMarker = L.AwesomeMarkers.icon({
+                                            var capitalIcon = L.AwesomeMarkers.icon({
                                                 icon: 'star',
                                                 markerColor: 'orange',
                                                 prefix: 'fa',
                                                 iconColor: 'white'
                                             });
                 
-                                            L.marker([capitalLat, capitalLng], {icon: capitalMarker}).addTo(mymap)
+                                            var capitalMarker = L.marker([capitalLat, capitalLng], {icon: capitalIcon})
                                                 .bindPopup(`<a href='http://${wikiLink}' target='_blank'>${newCapital}</a>, capital city of ${photoCountry}.<br><img src='${capitalImage}' width='300px'/>`);
+
+                                            markers.addLayer(capitalMarker);
                                          
                                         }
                                     
@@ -487,29 +473,9 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
                             
-                            var cities = result.data;
-                            
-
-                            cities.forEach(function(city) {
-                                var cityLat = city.lat;
-                                var cityLng = city.lng;
-                                var cityName = city.name;
-                                var newCityName = cityName.replace(/ /g, "%20");
-                                var cityPop = city.population;
-
-                                var cityMarker = L.AwesomeMarkers.icon({
-                                    icon: 'city',
-                                    markerColor: 'red',
-                                    prefix: 'fa',
-                                    iconColor: 'white'
-                                });
-
-                                var cityImage = "";
-                                var cityWiki = "";
+                            console.log(result);
 
                                 $.ajax({
                                     url: "php/wiki.php",
@@ -558,8 +524,10 @@ $('#countrySelect').change(function() {
                                           
                                                 $([cityImage]).preload();
                                 
-                                                L.marker([cityLat, cityLng], {icon: cityMarker}).addTo(mymap)
+                                                var cityMarker = L.marker([cityLat, cityLng], {icon: cityIcon})
                                                 .bindPopup(`<a href='http://${cityWiki}' target='_blank'>${cityName}</a>, population: ${formatNumber(cityPop)}.<br><img src='${cityImage}' width='300px'/>`);
+
+                                                markers.addLayer(cityMarker);
                                                
                                         }
                                     
@@ -568,8 +536,7 @@ $('#countrySelect').change(function() {
                                         // your error code
                                     }
                                 });
-                            
-                            });
+
 
 
                         }
@@ -590,8 +557,6 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
                             
                             var lakes = result.data;
@@ -602,7 +567,7 @@ $('#countrySelect').change(function() {
                                 var lakeName = lake.name;
                                 var newLakeName = lakeName.replace(/ /g, "%20");
 
-                                var lakeMarker = L.AwesomeMarkers.icon({
+                                var lakeIcon = L.AwesomeMarkers.icon({
                                     icon: 'water',
                                     markerColor: 'darkblue',
                                     prefix: 'fa',
@@ -658,8 +623,10 @@ $('#countrySelect').change(function() {
                                           
                                                 $([lakeImage]).preload();
 
-                                                L.marker([lakeLat, lakeLng], {icon: lakeMarker}).addTo(mymap)
+                                                var lakeMarker = L.marker([lakeLat, lakeLng], {icon: lakeIcon})
                                                 .bindPopup(`<a href='http://${lakeWiki}' target='_blank'>${lakeName}</a>.<br><img src='${lakeImage}' width='300px'/>`);
+
+                                                markers.addLayer(lakeMarker);
                                     
                                         }
                                     
@@ -688,8 +655,6 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
                             
                             var parks = result.data;
@@ -700,7 +665,7 @@ $('#countrySelect').change(function() {
                                 var parkName = park.name;
                                 var newParkName = parkName.replace(/ /g, "%20");
                                 
-                                    var parkMarker = L.AwesomeMarkers.icon({
+                                    var parkIcon = L.AwesomeMarkers.icon({
                                         icon: 'tree',
                                         markerColor: 'green',
                                         prefix: 'fa',
@@ -756,8 +721,10 @@ $('#countrySelect').change(function() {
                                               
                                                     $([parkImage]).preload();
     
-                                                    L.marker([parkLat, parkLng], {icon: parkMarker}).addTo(mymap)
-                                                    .bindPopup(`<a href='http://${parkWiki}' target='_blank'>${parkName}</a>.<br><img src='${parkImage}' width='300px'/>`);                                            
+                                                    var parkMarker = L.marker([parkLat, parkLng], {icon: parkIcon})
+                                                    .bindPopup(`<a href='http://${parkWiki}' target='_blank'>${parkName}</a>.<br><img src='${parkImage}' width='300px'/>`);  
+                                                    
+                                                    markers.addLayer(parkMarker);
                                         
                                             }
                                         
@@ -786,8 +753,6 @@ $('#countrySelect').change(function() {
             
                     success: function(result) {
             
-                        console.log(result);
-            
                         if (result.status.name == "ok") {
                             
                             var mountains = result.data;
@@ -799,7 +764,7 @@ $('#countrySelect').change(function() {
                                 var newMountainName = mountainName.replace(/ /g, "%20");
 
                         
-                                var mountainMarker = L.AwesomeMarkers.icon({
+                                var mountainIcon = L.AwesomeMarkers.icon({
                                     icon: 'mountain',
                                     markerColor: 'gray',
                                     prefix: 'fa',
@@ -855,8 +820,10 @@ $('#countrySelect').change(function() {
                                           
                                             $([mountainImage]).preload();
 
-                                                L.marker([mountainLat, mountainLng], {icon: mountainMarker}).addTo(mymap)
-                                                .bindPopup(`<a href='http://${mountainWiki}' target='_blank'>${mountainName}</a>.<br><img src='${mountainImage}' width='300px'/>`);                                            
+                                                var mountainMarker = L.marker([mountainLat, mountainLng], {icon: mountainIcon})
+                                                .bindPopup(`<a href='http://${mountainWiki}' target='_blank'>${mountainName}</a>.<br><img src='${mountainImage}' width='300px'/>`); 
+                                                
+                                                markers.addLayer(mountainMarker);
                                     
                                         }
                                     
@@ -885,8 +852,9 @@ $('#countrySelect').change(function() {
     });
 
 var newDemonym = "";
-
 });
+
+
 //ADDING COUNTRY INFO - RESTCOUNTRIES
 $('#countrySelect').change(function() {
 
@@ -899,8 +867,6 @@ $('#countrySelect').change(function() {
         },
 
         success: function(result) {
-
-            console.log(result);
 
             if (result.status.name == "ok") {
                 
@@ -932,7 +898,9 @@ $('#countrySelect').change(function() {
                         if (result.status.name == "ok") {    
                             
                             var anthem = result.data.data[0].id;
-                            $('#anthem').html(`<iframe scrolling="no" frameborder="0" allowTransparency="true" src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=500&height=90&color=EF5466&layout=&size=medium&type=tracks&id=${anthem}&app_id=1" width="500" height="90"></iframe>`);  
+                            $('#anthem').html(`<iframe scrolling="no" frameborder="0" allowTransparency="true" src="https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=true&width=500&height=90&color=EF5466&layout=&size=medium&type=tracks&id=${anthem}&app_id=1" width="500" height="90"></iframe>`);
+                            
+                            mymap.addLayer(markers);
                               
                         }
                     

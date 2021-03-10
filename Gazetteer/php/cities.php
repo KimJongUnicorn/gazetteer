@@ -3,23 +3,31 @@
     $executionStartTime = microtime(true) / 1000;
 
     $url="http://api.geonames.org/searchJSON?username=kimjongunicorn&country=" . $_REQUEST['country'] . "&featureCode=PPLA2&maxRows=20";
+	
+	$cityMarkers = ["type"=>"FeatureCollection","features"=>array()];
+	$temp = [];
+	$t = [];
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
+	while ($row = mysqli_fetch_assoc($url)) {
 
-	$result=curl_exec($ch);
+		$t['properties']['name'] = $row['name'];
+		$t['properties']['population'] = $row['population'];
 
-	curl_close($ch);
+		$t['type'] = "Feature";
+		$t['geometry']['type'] = 'Point';
+		$t['geometry']['coordinates'] = $row['lng'] + ',' + $row['lat'];				   
 
-	$decode = json_decode($result,true);	
+		array_push($temp, $t);
+
+	}
+
+	$cityMarkers['features'] = $temp;
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $decode['geonames'];
+	$output['data'] = $cityMarkers;
 	
 	header('Content-Type: application/json; charset=UTF-8');
 
