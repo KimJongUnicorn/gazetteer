@@ -2,26 +2,26 @@
 
     $executionStartTime = microtime(true) / 1000;
 
-    $url = json_decode(file_get_contents("http://api.geonames.org/searchJSON?username=kimjongunicorn&country=" . $_REQUEST['country'] . "&featureCode=MT&maxRows=10"), true);
+    $url = json_decode(file_get_contents("http://api.geonames.org/searchJSON?username=kimjongunicorn&country=" . $_REQUEST['country'] . "&featureCode=PPLC&maxRows=1"), true);
 	
-	$mountainMarkers = ["type"=>"FeatureCollection","features"=>array()];
+	$cityMarkers = ["type"=>"FeatureCollection","features"=>array()];
 	$temp = [];
 	$t = [];
 
 	$data = $url['geonames'];
 
-	foreach ($data as $mountain) {
+	foreach ($data as $city) {
 
 		$wikiString = 'en.wikipedia.org/wiki/';
 
-		$t['properties']['name'] = $mountain['name'];
-		$t['properties']['population'] = $mountain['population'];
-		$t['properties']['wiki'] = $wikiString . $mountain['name'];
+		$t['properties']['name'] = $city['name'];
+		$t['properties']['population'] = $city['population'];
+		$t['properties']['wiki'] = $wikiString . $city['name'];
 
 		$t['type'] = 'Feature';
 		$t['geometry']['type'] = 'Point';
-      	$lat = $mountain['lat'];
-      	$lng = $mountain['lng'];
+      	$lat = $city['lat'];
+      	$lng = $city['lng'];
 		$t['geometry']['coordinates'][0] = floatval($lng);
       	$t['geometry']['coordinates'][1] = floatval($lat);
 
@@ -44,17 +44,20 @@
 
 	} 
 
-	$mountainMarkers['features'] = $temp;
+	$cityMarkers['features'] = $temp;
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $mountainMarkers;
+	$output['data'] = $cityMarkers;
 	
 	header('Content-Type: application/json; charset=UTF-8');
 
 	echo json_encode($output); 
+
+	//adding photos
+
 	
 
 ?>

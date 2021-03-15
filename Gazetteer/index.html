@@ -7,6 +7,7 @@
         <meta name="description" content="Gazetteer">
         <meta name="author" content="Harry Adams">
         <meta content="width=device-width, initial-scale=1" name="viewport">
+        <meta name="theme-color" content="##F2EEE9">
         
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
         <!--Leaflet is loaded above in line 13-->
@@ -16,7 +17,10 @@
 
         <link rel="stylesheet" href="css/gazetteer.css">
 
-        <link rel="icon" type="image/png" href="favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/manifest.json">
 
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
@@ -53,6 +57,9 @@
                 <button id="musicButton">
                     <img id="musicIcon" src="icons/Orion_audio-file.png"/>
                 </button>
+
+                <div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                <div id="loader"></div>
                 
 
         <div id="mapid"></div>
@@ -64,6 +71,7 @@
         <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 
         <script type="application/javascript" src="js/script.js"></script>
+        <script src="js/index.js"></script>
 		
 
     </body>
